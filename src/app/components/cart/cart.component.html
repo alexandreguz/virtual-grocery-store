@@ -1,11 +1,44 @@
-<div class="cart">
-    <h2>My Cart</h2>
-    @for (item of cartItems; track item.id) {
-        <div>
-            <img [src]="item.image" width="50" />
-            <span>{{ item.name }} ({{ item.quantity }}) - ${{ item.price * item.quantity }}</span>
+<div class="cart-container">
+    @if (!checkoutMode) {
+      <div class="cart-view">
+        <h2>My Cart</h2>
+        @for (item of cartItems; track item.id) {
+          <div class="cart-item">
+            <img [src]="item.image" alt="{{ item.name }}" class="item-image">
+            <div>
+              <p>{{ item.name }}</p>
+              <p>Quantity: {{ item.quantity }}</p>
+              <p>Price: {{ item.price | number: '1.2-2' }}</p>
+            </div>
+            <button (click)="removeItem(item.id)">Remove</button>
+          </div>
+        }
+        <h3>Total: {{ cartTotal | currency:'USD' }}</h3>
+        <button (click)="toggleCheckout()">Order</button>
+      </div>
+    } @else {
+      <div class="checkout-view">
+        <h2>Order Summary</h2>
+        @for (item of cartItems; track item.id) {
+          <div class="cart-summary-item">
+            <p>{{ item.name }} (x{{ item.quantity }}) - {{ item.price * (item.quantity || 1) | currency:'USD' }}</p>
+          </div>
+        }
+        <h3>Total: {{ cartTotal | currency:'USD' }}</h3>
+
+        <div class="checkout-form">
+          <h3>Shipping Details</h3>
+          <input type="text" placeholder="Street">
+          <input type="text" placeholder="Number">
+          <input type="text" placeholder="City">
+          
+          <h3>Payment</h3>
+          <input type="text" placeholder="Credit Card Number">
+          
+          <button (click)="finalizeOrder()">Order</button>
+          <button (click)="toggleCheckout()">Back to Store</button>
         </div>
+      </div>
     }
-    <h3>Total: ${{ total }}</h3>
-    <button (click)="order()">Order</button>
   </div>
+  

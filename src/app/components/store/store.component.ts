@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CartService } from '../../services/cart.service';
-import { CommonModule } from '@angular/common';
 
 interface Product {
   id: number;
@@ -56,9 +55,6 @@ export class StoreComponent {
     { id: 36, name: 'Butter', price: 3, image: 'butter.webp', category: 'Milk & Eggs' },
     { id: 37, name: 'Yogurt', price: 7, image: 'yogurt.webp', category: 'Milk & Eggs' },
     { id: 38, name: 'Ice Cream', price: 8, image: 'ice-cream.jpeg', category: 'Milk & Eggs' },
-
-    
-
   ];
 
   constructor(private cartService: CartService) {}
@@ -73,7 +69,8 @@ export class StoreComponent {
       name: product.name,
       price: product.price,
       quantity: 1,
-      image: product.image
+      image: product.image,
+      category: product.category
     });
   }
 }

@@ -1,27 +1,43 @@
 import { Component } from '@angular/core';
 import { CartService } from '../../services/cart.service';
-
+import { Product } from '../../models/product.model';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [],
+  imports: [CurrencyPipe, DecimalPipe],
   templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css'
+  styleUrls: ['./cart.component.scss'],
 })
 export class CartComponent {
-  cartItems: any[] = [];
-  total: number = 0;
+  cartItems: Product[] = [];
+  cartTotal: number = 0;
+  checkoutMode = false;
 
-  constructor(private cartService: CartService) {
-    this.cartService.cart$.subscribe((cart) => {
-      this.cartItems = cart;
-      this.total = this.cartService.getTotalPrice();
+  constructor(private cartService: CartService) {}
+
+  ngOnInit() {
+    this.cartService.cart$.subscribe(items => {
+      this.cartItems = items;
+    });
+
+    this.cartService.cartTotal$.subscribe(total => {
+      this.cartTotal = total;
     });
   }
 
-  order() {
-    console.log('Ordering...');
-    alert('Proceeding to payment...');
+  removeItem(productId: number) {
+    this.cartService.removeFromCart(productId);
+  }
+
+  toggleCheckout() {
+    this.checkoutMode = !this.checkoutMode;
+  }
+
+  finalizeOrder() {
+    alert('Order placed successfully!');
+    this.cartService.clearCart();
+    this.checkoutMode = false;
   }
 }
