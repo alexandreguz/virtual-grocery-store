@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CartService } from '../../services/cart.service';
+import { CartComponent } from '../cart/cart.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 interface Product {
   id: number;
@@ -12,9 +14,9 @@ interface Product {
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [],
+  imports: [CartComponent, NavbarComponent],
   templateUrl: './store.component.html',
-  styleUrl: './store.component.css'
+  styleUrls: ['./store.component.css']
 })
 export class StoreComponent {
   categories = ['Milk & Eggs', 'Vegetables', 'Meat & Fish', 'Beverages', 'Fruits'];

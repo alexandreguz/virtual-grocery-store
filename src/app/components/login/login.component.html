@@ -1,0 +1,50 @@
+<!-- <nav class="navbar"> -->
+<!-- <div class="logo">Logo</div>
+    <button class="contact-btn">Contact (phone and email)</button> -->
+<app-navbar></app-navbar>
+<!-- </nav> -->
+
+<div class="login-container">
+  <div class="login-box">
+    <h2>Start Shopping</h2>
+    <form (ngSubmit)="onSubmit()">
+      <input
+        type="text"
+        placeholder="User Name"
+        [(ngModel)]="username"
+        name="username"
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        [(ngModel)]="password"
+        name="password"
+      />
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+    @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+    }
+    <a href="/signup">Sign up</a>
+  </div>
+
+  <div class="info-box">
+    <h2>Why you should buy in our store</h2>
+
+    <h3>Shop anytime, anywhere.</h3>
+    <h3>Access a wide range of products.</h3>
+    <h3>Get groceries delivered to your door.</h3>
+    <h3>Find online-exclusive discounts.</h3>
+    <h3>Skip long checkout lines.</h3>
+    <h3>Easy to compare prices and read reviews.</h3>
+    <h3>Happy online shopping! 🚛📦😊</h3>
+  </div>
+
+  <div class="notifications-box">
+    <!-- <div class="image-placeholder">Picture</div> -->
+    <p>Available products in our store - {{number}}</p>
+    <p>{{orders}} orders submitted in our store</p>
+    <p class="notification">
+    </p>
+  </div>
+</div>
