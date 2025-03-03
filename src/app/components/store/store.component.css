@@ -1,0 +1,10 @@
+.store { padding: 10px; background: cadetblue; height: 80vh;}
+.products { display: flex; flex-wrap: wrap; gap: 10px; }
+.product { cursor: pointer; padding: 10px; border: 1px solid #ddd; text-align: center; }
+.product:hover { background-color: #f0f0f0; }
+button {
+    padding: 4px;
+    background: beige;
+    border-radius: 5px;
+    margin: 1px;
+}

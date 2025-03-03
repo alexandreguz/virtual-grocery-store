@@ -1,0 +1,11 @@
+.cart {  
+    background: lightblue; 
+    padding: 10px; 
+    margin-right: 10px; 
+    height: 80vh; 
+}
+
+button {
+    background: beige;
+    border-radius: 5px;
+}

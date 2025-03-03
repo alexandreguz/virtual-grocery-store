@@ -1,0 +1,11 @@
+<div class="cart">
+    <h2>My Cart</h2>
+    @for (item of cartItems; track item.id) {
+        <div>
+            <img [src]="item.image" width="50" />
+            <span>{{ item.name }} ({{ item.quantity }}) - ${{ item.price * item.quantity }}</span>
+        </div>
+    }
+    <h3>Total: ${{ total }}</h3>
+    <button (click)="order()">Order</button>
+  </div>
