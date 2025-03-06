@@ -4,12 +4,13 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const cors = require('cors')
 
 const app = express();
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(cors());
 
-// Configuração do banco de dados PostgreSQL
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -17,8 +18,6 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
-
-
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -70,7 +69,6 @@ const adminMiddleware = (req, res, next) => {
   next();
 };
 
-
 app.post('/api/auth/register', async (req, res) => {
   const { first_name, last_name, email, identity_number, password, city, street, role } = req.body;
   try {
@@ -90,7 +88,6 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -105,6 +102,7 @@ app.post('/api/auth/login', async (req, res) => {
     const user = userQuery.rows[0];
     console.log(`✅ Usuário encontrado: ${user.email}`);
     console.log(`🔑 Senha armazenada: ${user.password}`);
+    console.log(password)
 
     const validPassword = await bcrypt.compare(password, user.password);
     console.log(`🔎 Senha válida? ${validPassword}`);
@@ -124,7 +122,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-
 app.get('/api/products', async (req, res) => {
   try {
     const products = await pool.query('SELECT * FROM products');
@@ -134,7 +131,6 @@ app.get('/api/products', async (req, res) => {
     res.status(500).json({ message: 'Error fetching products', error });
   }
 });
-
 
 const validateProductData = (req, res, next) => {
   const { product_name, category_id, price } = req.body;
@@ -146,7 +142,6 @@ const validateProductData = (req, res, next) => {
 
   next();
 };
-
 
 app.post('/api/admin/products', authMiddleware, adminMiddleware, async (req, res) => {
   const { product_name, category_id, price, image, stock_quantity } = req.body;
@@ -189,4 +184,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
