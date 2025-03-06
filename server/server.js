@@ -7,6 +7,7 @@ const { Pool } = require('pg');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.json());
 
 // Configuração do banco de dados PostgreSQL
 const pool = new Pool({
@@ -17,25 +18,6 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Middleware de autenticação
-// const authMiddleware = (req, res, next) => {
-//   const token = req.headers['authorization']?.split(' ')[1];
-//   if (!token) return res.status(403).json({ message: 'Token not provided' });
-  
-//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-//     if (err) return res.status(403).json({ message: 'Invalid token' });
-//     req.user = decoded;
-//     next();
-//   });
-// };
-
-// // Middleware de autenticação para admin
-// const adminMiddleware = (req, res, next) => {
-//   if (req.user.role !== 'admin') {
-//     return res.status(403).json({ message: 'Access denied' });
-//   }
-//   next();
-// };
 
 
 const authMiddleware = (req, res, next) => {
@@ -44,7 +26,6 @@ const authMiddleware = (req, res, next) => {
 
   let token = authHeader?.split(' ')[1];
 
-  // Remove aspas duplas se existirem
   token = token?.replace(/"/g, '');
   console.log("📦 Token extraído (sem aspas):", token);
 
@@ -90,9 +71,6 @@ const adminMiddleware = (req, res, next) => {
 };
 
 
-
-
-// Registrar usuário
 app.post('/api/auth/register', async (req, res) => {
   const { first_name, last_name, email, identity_number, password, city, street, role } = req.body;
   try {
@@ -111,25 +89,6 @@ app.post('/api/auth/register', async (req, res) => {
     res.status(500).json({ message: 'Error registering user', error });
   }
 });
-
-// Login do usuário
-// app.post('/api/auth/login', async (req, res) => {
-//   const { email, password } = req.body;
-//   try {
-//     const userQuery = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-//     if (userQuery.rows.length === 0) return res.status(400).json({ message: 'User not found' });
-
-//     const user = userQuery.rows[0];
-//     const validPassword = await bcrypt.compare(password, user.password);
-//     if (!validPassword) return res.status(400).json({ message: 'Invalid password' });
-    
-//     const token = jwt.sign({ id: user.user_id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-//     res.json({ message: 'Login successful', token });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Login error', error });
-//   }
-// });
 
 
 app.post('/api/auth/login', async (req, res) => {
@@ -166,10 +125,6 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 
-
-
-
-// Listar produtos
 app.get('/api/products', async (req, res) => {
   try {
     const products = await pool.query('SELECT * FROM products');
@@ -180,7 +135,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// Criar produto (somente admin)
 
 const validateProductData = (req, res, next) => {
   const { product_name, category_id, price } = req.body;
@@ -192,7 +146,6 @@ const validateProductData = (req, res, next) => {
 
   next();
 };
-
 
 
 app.post('/api/admin/products', authMiddleware, adminMiddleware, async (req, res) => {
@@ -209,7 +162,6 @@ app.post('/api/admin/products', authMiddleware, adminMiddleware, async (req, res
   }
 });
 
-// Criar carrinho
 app.post('/api/cart', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('INSERT INTO carts (user_id) VALUES ($1) RETURNING cart_id', [req.user.id]);
@@ -220,7 +172,6 @@ app.post('/api/cart', authMiddleware, async (req, res) => {
   }
 });
 
-// Adicionar item ao carrinho
 app.post('/api/cart/items', authMiddleware, async (req, res) => {
   const { product_id, quantity, price_at_time, cart_id } = req.body;
   try {
@@ -238,3 +189,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
