@@ -3,6 +3,9 @@
         <img src="store.png" alt="store_logo" width="60">
     </div>
     <div class="profile">
-        EMAIL
+        {{ userEmail || 'EMAIL' }}  
+        @if (userEmail) {
+            <button (click)="logout()" class="logout-btn">Logout</button>
+        }
     </div>
 </div>

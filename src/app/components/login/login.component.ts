@@ -5,6 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AuthService } from '../../services/auth.service';
 
+interface LoginResponse {
+  token: string;
+}
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -22,16 +26,14 @@ export class LoginComponent {
 
   constructor(private router: Router, private authService: AuthService) {}
 
-
-
   login() {
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (response) => {
+    this.authService.loginWithCredentials({ email: this.email, password: this.password }).subscribe({
+      next: (response: LoginResponse) => {
         localStorage.setItem('token', response.token);
         alert('Login bem-sucedido!');
         this.router.navigate(['/store']);
       },
-      error: (error) => {
+      error: (error: any) => {
         alert('Erro no login!');
       }
     });

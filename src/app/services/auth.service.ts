@@ -1,28 +1,45 @@
+
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private userEmailSubject = new BehaviorSubject<string | null>(null);
 
-  constructor(private http: HttpClient) {}
-
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+  constructor() {
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail) {
+      this.userEmailSubject.next(savedEmail);
+    }
   }
 
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials);
+  login(email: string) {
+    localStorage.setItem('userEmail', email);
+    this.userEmailSubject.next(email);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  logout() {
+    localStorage.removeItem('userEmail');
+    this.userEmailSubject.next(null);
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+  getUserEmail(): Observable<string | null> {
+    return this.userEmailSubject.asObservable();
+  }
+
+  loginWithCredentials(credentials: LoginCredentials): Observable<LoginResponse> {
+    // Simulação de login bem-sucedido
+    return of({ token: 'fake-jwt-token' });
   }
 }
