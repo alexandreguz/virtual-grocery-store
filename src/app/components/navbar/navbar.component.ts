@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service'; // Ajuste o caminho conforme necessário
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +12,7 @@ import { AuthService } from '../../services/auth.service'; // Ajuste o caminho c
 export class NavbarComponent {
   userEmail: string | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.authService.getUserEmail().subscribe(email => {
@@ -20,7 +21,9 @@ export class NavbarComponent {
   }
 
   logout() {
+    localStorage.removeItem('token');
     this.authService.logout();
-    this.userEmail = null; 
+    this.userEmail = null;
+    this.router.navigate(['/login']);
   }
 }

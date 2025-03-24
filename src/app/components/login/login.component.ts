@@ -14,8 +14,7 @@ interface LoginResponse {
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  providers: [AuthService]
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   email: string = '';
@@ -30,6 +29,7 @@ export class LoginComponent {
     this.authService.loginWithCredentials({ email: this.email, password: this.password }).subscribe({
       next: (response: LoginResponse) => {
         localStorage.setItem('token', response.token);
+        this.authService.login(this.email);
         alert('Login bem-sucedido!');
         this.router.navigate(['/store']);
       },
