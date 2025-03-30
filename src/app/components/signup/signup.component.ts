@@ -58,14 +58,21 @@ export class SignupComponent {
   
     this.authService.register(userData).subscribe({
       next: (response: any) => {
-        console.log('User registered successfully!', response);
-        this.router.navigate(['/store']);
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          this.authService.login(email);
+  
+          alert('Registration and login sucesfull!');
+          this.router.navigate(['/store']);
+        } else {
+          alert('Error. Make Login manually');
+        }
       },
       error: (error) => {
-        console.error('Error registering user:', error);
+        console.error('Error in registration:', error);
         this.errorMessage = error.status === 400 && error.error.message
           ? error.error.message
-          : 'An error occurred during registration.';
+          : 'Error at registration.';
       },
     });
   }
