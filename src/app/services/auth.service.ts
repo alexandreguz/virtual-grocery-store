@@ -1,7 +1,7 @@
-
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 export interface LoginCredentials {
   email: string;
@@ -12,14 +12,25 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface RegisterData {
+  identity_number: string;
+  email: string;
+  password: string;
+  city: string;
+  street: string;
+  first_name: string;
+  last_name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private userEmailSubject = new BehaviorSubject<string | null>(null);
   private isBrowser: boolean;
+  private apiUrl = 'http://localhost:3000/api/auth';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     
     if (this.isBrowser) {
@@ -50,31 +61,10 @@ export class AuthService {
   }
 
   loginWithCredentials(credentials: LoginCredentials): Observable<LoginResponse> {
-    const apiUrl = 'http://localhost:3000/api/auth/login';
-    
-    const headers = new Headers({
-      'Content-Type': 'application/json'
-    });
-    
-    return new Observable<LoginResponse>((observer) => {
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(credentials)
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
-        return response.json();
-      })
-      .then(data => {
-        observer.next({ token: data.token });
-        observer.complete();
-      })
-      .catch(error => {
-        observer.error(error);
-      });
-    });
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
+  }
+
+  register(userData: RegisterData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, userData);
   }
 }
