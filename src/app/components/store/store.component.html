@@ -5,6 +5,13 @@
     <div class="store">
         <h2>Store</h2>
         
+        <!-- Botão Admin para adicionar produtos (visível apenas para admins) -->
+        @if (isUserAdmin()) {
+          <button class="admin-button" (click)="openAddProductPopup()">
+            Adicionar Novo Produto
+          </button>
+        }
+        
         <!-- Botões para escolher categorias -->
         <div>
             @for (category of categories; track category) {
@@ -16,7 +23,7 @@
         <div class="products">
           @for (product of displayedProducts; track product.id) {
             <div class="product" (click)="addToCart(product)">
-              <img [src]="product.image" width="100" />
+              <img [src]="getImagePath(product.image)" width="100" />
               <p>{{ product.name }} - ${{ product.price }}</p>
             </div>
           }
@@ -24,3 +31,8 @@
     </div>
   </div>
 </div>
+
+<!-- Admin Add Product Popup -->
+@if (showAddProductPopup) {
+  <app-add-product (close)="closeAddProductPopup()"></app-add-product>
+}

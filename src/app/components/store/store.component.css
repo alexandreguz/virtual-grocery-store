@@ -25,6 +25,15 @@ button {
     margin: 1px;
 }
 
+.admin-button {
+    background-color: #dc3545 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
 .navbar {
     background-color: #333;
     color: white;
