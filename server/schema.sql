@@ -33,7 +33,7 @@ CREATE TABLE products (
     name VARCHAR(100) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     image VARCHAR(255),
-    category VARCHAR(100) NOT NULL,
+    category_id INTEGER REFERENCES categories(category_id), 
     stock_quantity INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -85,13 +85,15 @@ VALUES
     ('Fruits'),
     ('Vegetables'),
     ('Dairy');
+    ('Meat, Fish & Eggs'),
+    ('Beverages');
 
 INSERT INTO products (name, category, price, image, stock_quantity)
 VALUES 
     ('Apple', 'Fruits', 0.50, 'apple.jpeg', 100),
     ('Banana', 'Fruits', 0.30, 'banana.jpg', 150),
     ('Carrot', 'Vegetables', 0.25, 'carrot.jpg', 200),
-    ('Milk', 'Milk & Eggs', 2.99, 'milk.webp', 50);
+    ('Milk', 'Dairy', 2.99, 'milk.webp', 50);
 
 
 SELECT * FROM products

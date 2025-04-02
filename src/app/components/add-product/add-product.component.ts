@@ -18,10 +18,11 @@ export class AddProductComponent {
     name: '',
     price: 0,
     image: '',
-    category: ''
+    category: 'Fruits',
+    quantity: 0 
   };
   
-  categories = ['Milk & Eggs', 'Vegetables', 'Meat & Fish', 'Beverages', 'Fruits'];
+  categories = ['Dairy', 'Vegetables', 'Meat, Fish & Eggs', 'Beverages', 'Fruits'];
   successMessage = '';
   errorMessage = '';
   
@@ -59,7 +60,8 @@ export class AddProductComponent {
           name: '',
           price: 0,
           image: '',
-          category: ''
+          category: 'Fruits',
+          quantity: 0
         };
         
         // Fechar o popup após 2 segundos

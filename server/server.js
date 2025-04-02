@@ -29,6 +29,15 @@ pool.connect((err, client, done) => {
   }
 });
 
+// Category name to ID mapping
+const categoryNameToId = {
+  'Fruits': 1,
+  'Vegetables': 2,
+  'Dairy': 3,
+  'Meat, Fish & Eggs': 4,
+  'Beverages': 5,
+};
+
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   console.log("🔑 Authorization Header:", authHeader);
@@ -161,62 +170,58 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await pool.query('SELECT * FROM products');
+    const products = await pool.query(
+    `
+      SELECT 
+        p.product_id, 
+        p.product_name, 
+        p.price, 
+        p.image, 
+        c.category_name 
+      FROM products p
+      JOIN categories c ON p.category_id = c.category_id
+      `
+    );
     console.log('Produtos do banco de dados:', products.rows);
     
     const formattedProducts = products.rows.map(p => ({
       id: p.product_id,
-      name: p.name,
+      name: p.product_name,
       price: p.price,
       image: p.image,
-      category: p.category
+      category: p.category_name
     }));
     
     console.log('Produtos formatados para o frontend:', formattedProducts);
     
-    // Se não tivermos produtos do banco, use dados de exemplo
-    if (formattedProducts.length === 0) {
-      console.log('Nenhum produto encontrado no banco, usando dados de exemplo');
-      
-      const sampleProducts = [
-        { id: 1, name: 'Milk', price: 5, image: 'milk.webp', category: 'Milk & Eggs' },
-        { id: 2, name: 'Eggs', price: 3, image: 'eggs.jpeg', category: 'Milk & Eggs' },
-        { id: 3, name: 'Carrot', price: 1, image: 'carrot.jpg', category: 'Vegetables' },
-        { id: 4, name: 'Apple', price: 2, image: 'apple.jpeg', category: 'Fruits' },
-        { id: 5, name: 'Beer', price: 4, image: 'beer.jpg', category: 'Beverages' }
-      ];
-      
-      return res.json(sampleProducts);
-    }
-    
     res.json(formattedProducts);
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
-    
-    // Em caso de erro, retornar dados de exemplo
-    const fallbackProducts = [
-      { id: 1, name: 'Milk', price: 5, image: 'milk.webp', category: 'Milk & Eggs' },
-      { id: 2, name: 'Eggs', price: 3, image: 'eggs.jpeg', category: 'Milk & Eggs' },
-      { id: 3, name: 'Carrot', price: 1, image: 'carrot.jpg', category: 'Vegetables' },
-      { id: 4, name: 'Apple', price: 2, image: 'apple.jpeg', category: 'Fruits' },
-      { id: 5, name: 'Beer', price: 4, image: 'beer.jpg', category: 'Beverages' }
-    ];
-    
-    console.log('Erro ao buscar produtos, usando dados de fallback');
-    res.json(fallbackProducts);
+    res.status(500).json({ message: 'Erro ao buscar produtos', error });
+
   }
 });
 
 app.get('/api/products/category/:category', async (req, res) => {
   try {
     const category = req.params.category;
-    const products = await pool.query('SELECT * FROM products WHERE category = $1', [category]);
+    const products = await pool.query(
+    `
+      SELECT 
+        p.product_id, 
+        p.product_name, 
+        p.price, 
+        p.image, 
+        c.category_name 
+      FROM products p
+      JOIN categories c ON p.category_id = c.category_id
+      WHERE c.category_name = $1`, [category]);
     res.json(products.rows.map(p => ({
       id: p.product_id,
-      name: p.name,
+      name: p.product_name,
       price: p.price,
       image: p.image,
-      category: p.category
+      category: p.category_name
     })));
   } catch (error) {
     console.error(error);
@@ -225,32 +230,45 @@ app.get('/api/products/category/:category', async (req, res) => {
 });
 
 const validateProductData = (req, res, next) => {
-  const { name, price, category, image } = req.body;
+  const { name, price, category, image, quantity } = req.body;
 
-  if (!name || !category || price === undefined || !image) {
+  if (!name || !category || price === undefined || !image || quantity === undefined) {
     console.log("❗ Dados do produto incompletos:", req.body);
     return res.status(400).json({ message: 'Product name, category, price, and image are required' });
   }
-
+  if (typeof category !== 'string') {
+    return res.status(400).json({ message: 'Category must be a string' });
+  }
+    if (typeof quantity !== 'number') {
+    return res.status(400).json({ message: 'Quantity must be a number' });
+  }
   next();
 };
 
 app.post('/api/products', validateProductData, async (req, res) => {
-  const { name, price, image, category } = req.body;
+  console.log("PRODUCT ADDED: ", req.body);
+  const { name, price, image, category, quantity } = req.body;
   try {
+    // Convert category name to ID
+    const categoryId = categoryNameToId[category];
+    if (!categoryId) {
+      return res.status(400).json({ message: 'Invalid category name' });
+    }
+
     const result = await pool.query(
-      'INSERT INTO products (name, price, image, category) VALUES ($1, $2, $3, $4) RETURNING product_id',
-      [name, price, image, category]
+      'INSERT INTO products (product_name, price, image, category_id, stock_quantity) VALUES ($1, $2, $3, $4, $5) RETURNING product_id',
+      [name, price, image, categoryId, quantity]
     );
-    
+
     const newProduct = {
       id: result.rows[0].product_id,
       name,
       price,
       image,
-      category
+      category,
+      quantity
     };
-    
+
     res.status(201).json({ message: 'Product created successfully', product: newProduct });
   } catch (error) {
     console.error(error);

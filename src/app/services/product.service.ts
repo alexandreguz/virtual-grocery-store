@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { Product } from '../models/product.model';
 import { isPlatformBrowser } from '@angular/common';
@@ -33,28 +33,11 @@ export class ProductService {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
-      tap(response => console.log('Resposta original da API:', response)),
-      map(response => {
-        // Se a resposta for um array, retorne-o diretamente
-        if (Array.isArray(response)) {
-          return response;
-        }
-        // Se a resposta estiver em um formato diferente, tente extrair os produtos
-        else if (response && response.products) {
-          return response.products;
-        }
-        // Caso contrário, verifique se é um objeto e converta para array
-        else if (response && typeof response === 'object') {
-          // Alguns backends retornam objetos em vez de arrays
-          return Object.values(response);
-        }
-        return [];
-      }),
-      tap(products => console.log('Produtos processados:', products)),
+    return this.http.get<Product[]>(this.apiUrl).pipe(
+      tap(products => console.log('Produtos carregados:', products)),
       catchError(error => {
         console.error('Erro ao carregar produtos:', error);
-        return of([]);
+        return throwError(() => error);
       })
     );
   }
@@ -68,14 +51,14 @@ export class ProductService {
     );
   }
 
-  addProduct(product: Omit<Product, 'id'>): Observable<Product> {
+
+  addProduct(product: Omit<Product, 'id'> & { quantity: number }): Observable<Product> {
     const headers = this.getHeaders();
     return this.http.post<Product>(this.apiUrl, product, { headers }).pipe(
       tap(newProduct => console.log('Produto adicionado:', newProduct)),
       catchError(error => {
         console.error('Erro ao adicionar produto:', error);
-        // Return observable instead of throwing to prevent unhandled rejections
-        return of({ id: 0, name: '', price: 0, image: '', category: '' } as Product);
+        return throwError(() => error);
       })
     );
   }

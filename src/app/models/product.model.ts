@@ -4,7 +4,7 @@ export interface Product {
   price: number;
   image: string;
   category: string;
-  quantity?: number; // Opcional, usado apenas no carrinho
+  quantity: number; 
 }
 
 export interface User {
