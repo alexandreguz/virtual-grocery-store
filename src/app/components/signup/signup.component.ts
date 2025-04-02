@@ -59,8 +59,7 @@ export class SignupComponent {
     this.authService.register(userData).subscribe({
       next: (response: any) => {
         if (response.token) {
-          localStorage.setItem('token', response.token);
-          this.authService.login(email);
+          this.authService.login(email, 'client');
   
           alert('Registration and login sucesfull!');
           this.router.navigate(['/store']);

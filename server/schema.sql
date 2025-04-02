@@ -30,10 +30,10 @@ CREATE TABLE categories (
 -- Products table
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
-    product_name VARCHAR(100) NOT NULL,
-    category_id INTEGER REFERENCES categories(category_id),
+    name VARCHAR(100) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     image VARCHAR(255),
+    category_id INTEGER REFERENCES categories(category_id), 
     stock_quantity INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -85,13 +85,15 @@ VALUES
     ('Fruits'),
     ('Vegetables'),
     ('Dairy');
+    ('Meat, Fish & Eggs'),
+    ('Beverages');
 
-INSERT INTO products (product_name, category_id, price, stock_quantity)
+INSERT INTO products (name, category, price, image, stock_quantity)
 VALUES 
-    ('Apple', 1, 0.50, 100),
-    ('Banana', 1, 0.30, 150),
-    ('Carrot', 2, 0.25, 200),
-    ('Milk', 3, 2.99, 50);
+    ('Apple', 'Fruits', 0.50, 'apple.jpeg', 100),
+    ('Banana', 'Fruits', 0.30, 'banana.jpg', 150),
+    ('Carrot', 'Vegetables', 0.25, 'carrot.jpg', 200),
+    ('Milk', 'Dairy', 2.99, 'milk.webp', 50);
 
 
 SELECT * FROM products

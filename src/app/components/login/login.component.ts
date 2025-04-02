@@ -4,10 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { AuthService } from '../../services/auth.service';
-
-interface LoginResponse {
-  token: string;
-}
+import { LoginResponse } from '../../models/product.model';
 
 @Component({
   selector: 'app-login',
@@ -26,14 +23,34 @@ export class LoginComponent {
   constructor(private router: Router, private authService: AuthService) {}
 
   login() {
+    console.log('Tentando login com:', this.email);
+    
     this.authService.loginWithCredentials({ email: this.email, password: this.password }).subscribe({
-      next: (response: LoginResponse) => {
-        localStorage.setItem('token', response.token);
-        this.authService.login(this.email);
+      next: (response: any) => {
+        console.log('Resposta do login:', response);
+        
+        // Verificar se a resposta contém informações do usuário
+        if (response.user && response.user.role) {
+          console.log('Role do usuário na resposta:', response.user.role);
+          this.authService.login(this.email, response.user.role);
+          console.log('Usuário logado com role:', response.user.role);
+        } else {
+          console.log('Resposta não contém role, usando client como padrão');
+          this.authService.login(this.email);
+        }
+        
+        // Verificação adicional para testes - forçar admin para email específico
+        // REMOVER EM PRODUÇÃO
+        if (this.email === 'admin@example.com') {
+          console.log('Usuário admin detectado, definindo role como admin');
+          this.authService.login(this.email, 'admin');
+        }
+        
         alert('Login bem-sucedido!');
         this.router.navigate(['/store']);
       },
       error: (error: any) => {
+        console.error('Erro no login:', error);
         alert('Erro no login!');
       }
     });
