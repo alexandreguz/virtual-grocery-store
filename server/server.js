@@ -287,16 +287,19 @@ app.post('/api/cart', authMiddleware, async (req, res) => {
 });
 
 app.post('/api/cart/items', authMiddleware, async (req, res) => {
-  const { product_id, quantity, price_at_time, cart_id } = req.body;
+  const { product_id, quantity, price } = req.body;
+  const user_id = req.user.id;
+  
+  console.log('Received cart item:', { product_id, quantity, price, user_id });
   
   // Validate required fields
-  if (!product_id || !quantity || !price_at_time || !cart_id) {
-    return res.status(400).json({ message: 'Missing required fields. product_id, quantity, price_at_time, and cart_id are required.' });
+  if (!product_id || !quantity || !price) {
+    return res.status(400).json({ message: 'Missing required fields. product_id, quantity, and price are required.' });
   }
   
   try {
-    await pool.query('INSERT INTO cart_items (product_id, quantity, price_at_time, cart_id) VALUES ($1, $2, $3, $4)',
-      [product_id, quantity, price_at_time, cart_id]
+    await pool.query('INSERT INTO cart_items (product_id, quantity, price, user_id) VALUES ($1, $2, $3, $4)',
+      [product_id, quantity, price, user_id]
     );
     res.status(201).json({ message: 'Item added to cart' });
   } catch (error) {

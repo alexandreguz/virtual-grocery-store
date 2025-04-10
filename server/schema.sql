@@ -50,11 +50,11 @@ CREATE TABLE carts (
 
 -- Cart items
 CREATE TABLE cart_items (
-    item_id SERIAL PRIMARY KEY,
-    cart_id INTEGER REFERENCES carts(cart_id),
+    cart_item_id SERIAL PRIMARY KEY,
     product_id INTEGER REFERENCES products(product_id),
     quantity INTEGER NOT NULL CHECK (quantity > 0),
-    price_at_time DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    user_id INTEGER REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

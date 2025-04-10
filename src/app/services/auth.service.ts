@@ -25,6 +25,7 @@ export interface RegisterData {
 export class AuthService {
   private userEmailSubject = new BehaviorSubject<string | null>(null);
   private userRoleSubject = new BehaviorSubject<string | null>(null);
+  private userIdSubject = new BehaviorSubject<number | null>(null);
   private showAdminPopupSubject = new BehaviorSubject<boolean>(false);
   private isBrowser: boolean;
   private apiUrl = 'http://localhost:3000/api/auth';
@@ -36,10 +37,12 @@ export class AuthService {
     if (this.isBrowser) {
       const savedEmail = localStorage.getItem('userEmail');
       const savedRole = localStorage.getItem('userRole');
+      const savedUserId = localStorage.getItem('userId');
       
       console.log('Verificando localStorage no navegador');
       console.log('Email:', savedEmail);
       console.log('Role:', savedRole);
+      console.log('UserId:', savedUserId);
       
       if (savedEmail) {
         this.userEmailSubject.next(savedEmail);
@@ -51,15 +54,22 @@ export class AuthService {
           this.showAdminPopupSubject.next(true);
         }
       }
+      if (savedUserId) {
+        this.userIdSubject.next(Number(savedUserId));
+      }
     }
   }
 
-  login(email: string, role: string = 'client') {
-    console.log(`Login chamado para email: ${email}, role: ${role}`);
+  login(email: string, role: string = 'client', userId?: number) {
+    console.log(`Login chamado para email: ${email}, role: ${role}, userId: ${userId}`);
     
     if (this.isBrowser) {
       localStorage.setItem('userEmail', email);
       localStorage.setItem('userRole', role);
+      if (userId) {
+        localStorage.setItem('userId', userId.toString());
+        this.userIdSubject.next(userId);
+      }
       this.userEmailSubject.next(email);
       this.userRoleSubject.next(role);
       
@@ -78,9 +88,11 @@ export class AuthService {
     if (this.isBrowser) {
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userRole');
+      localStorage.removeItem('userId');
       localStorage.removeItem('token');
       this.userEmailSubject.next(null);
       this.userRoleSubject.next(null);
+      this.userIdSubject.next(null);
       this.showAdminPopupSubject.next(false);
     }
   }
@@ -91,6 +103,14 @@ export class AuthService {
 
   getUserRole(): Observable<string | null> {
     return this.userRoleSubject.asObservable();
+  }
+  
+  getUserId(): Observable<number | null> {
+    return this.userIdSubject.asObservable();
+  }
+  
+  getCurrentUserId(): number | null {
+    return this.userIdSubject.getValue();
   }
 
   isAdmin(): boolean {

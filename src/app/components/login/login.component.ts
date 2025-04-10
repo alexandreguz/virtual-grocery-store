@@ -32,8 +32,15 @@ export class LoginComponent {
         // Verificar se a resposta contém informações do usuário
         if (response.user && response.user.role) {
           console.log('Role do usuário na resposta:', response.user.role);
-          this.authService.login(this.email, response.user.role);
+          console.log('ID do usuário na resposta:', response.user.id);
+          this.authService.login(this.email, response.user.role, response.user.id);
           console.log('Usuário logado com role:', response.user.role);
+          
+          // Salvar o token no localStorage
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+            console.log('Token salvo no localStorage');
+          }
         } else {
           console.log('Resposta não contém role, usando client como padrão');
           this.authService.login(this.email);
