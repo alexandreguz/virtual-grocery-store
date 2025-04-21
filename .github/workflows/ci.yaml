@@ -34,7 +34,7 @@ jobs:
 
       # Roda testes do frontend (sem Karma)
       - name: Testes do Angular
-        run: npm run test -- --watch=false --browsers=false
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
 
       # Instala dependências do backend
       - name: Instala dependências do Node.js backend
