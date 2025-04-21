@@ -1,0 +1,41 @@
+name: CI - Angular + Node
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v3
+
+    - name: Configura Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Instala dependências do backend
+      working-directory: ./server
+      run: npm install
+
+    - name: Verifica se o servidor sobe (teste simples)
+      working-directory: ./server
+      run: node -e "require('./server.js')"
+
+    - name: Instala dependências do frontend
+      run: npm install
+
+    - name: Roda testes do Angular
+      run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+    - name: Build do Angular
+      run: npm run build
